@@ -1,9 +1,12 @@
 {
   "name": "rootlab",
   "private": true,
+  "homepage": "https://lordspinx.github.io/rootlab",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "rootlab -d build",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
