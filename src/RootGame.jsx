@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import changeIcon from "./assets/change.png";
 
 function RootGame() {
   const [number, setNumber] = useState(null);
@@ -7,7 +8,7 @@ function RootGame() {
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
   const [highscore, setHighscore] = useState(0);
-  const [mode, setMode] = useState("hard");
+  const [mode, setMode] = useState("easy");
 
   useEffect(() => {
     startNewGame();
@@ -55,55 +56,63 @@ function RootGame() {
   };
 
   return (
-    <div className="p-8 max-w-md mx-auto text-center">
-      <h2 className="text-2xl font-bold mb-2">
-        Modus: {mode === "easy" ? "Einfach" : "Schwer"}
-      </h2>
+    <div className="card">
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginBottom: "12px" }}>
+        <h2 style={{ margin: 0 }}>
+          Modus: {mode === "easy" ? "Einfach" : "Schwer"}
+        </h2>
+        <button
+          onClick={() => setMode(mode === "easy" ? "hard" : "easy")}
+          style={{
+            cursor: "pointer"
+          }}
+        >
+          <img
+            className="change"
+            src={changeIcon}
+            style={{ height: "1rem", overflow: "hidden"}}
+          />
+        </button>
+      </div>
 
-      <button
-        onClick={() => setMode(mode === "easy" ? "hard" : "easy")}
-        className="mb-4 px-4 py-1 bg-gray-700 text-white rounded"
-      >
-        Modus wechseln
-      </button>
-
-      <p className="mb-2 text-lg">Highscore: {highscore}</p>
+      <p>Highscore: {highscore}</p>
 
       {number && !gameOver ? (
         <>
-          <p className="mb-2">
+          <p>
             Wurzel von: <strong>{number}</strong>
           </p>
           <input
             type="text"
-            className="border px-4 py-2 rounded w-full text-center text-xl"
             placeholder={
               mode === "easy"
-                ? "Ganzzahlige Wurzel (Enter bestätigen)"
+                ? "Ganzzahlige Wurzel"
                 : "Wurzel mit Nachkommastellen"
             }
             value={userInput}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
+            className="input-field"
           />
-          <p className="mt-2">Punkte: {score}</p>
+          <p>Punkte: {score}</p>
         </>
       ) : gameOver ? (
-        <div className="text-red-600 font-bold text-xl space-y-2">
-          <p>Spiel vorbei!</p>
+        <>
+          <p style={{ color: "var(--danger)", fontWeight: "bold" }}>
+            Spiel vorbei!
+          </p>
           <p>Richtige Wurzel: {correctRoot}</p>
           <p>Dein Score: {score}</p>
           <button
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
             onClick={() => {
               setScore(0);
               setGameOver(false);
               startNewGame();
             }}
           >
-            Neues Spiel starten
+            Neues Spiel
           </button>
-        </div>
+        </>
       ) : (
         <p>Zahl wird geladen...</p>
       )}

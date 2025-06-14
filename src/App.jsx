@@ -9,7 +9,7 @@ function App() {
   return (
     <>
       {/*<h1>RootLab</h1>*/}
-      <img src={logo} style={{filter: 'invert(1)'}}></img>
+      <img className="logo" src={logo} style={{filter: 'invert(1)'}}></img>
       <RootGame />
     </>
   )
