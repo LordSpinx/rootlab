@@ -16,33 +16,65 @@ function RootGame() {
 
   const startNewGame = () => {
     const randomNum = Math.floor(Math.random() * 1000) + 1;
-    const root = Math.sqrt(randomNum);
+    const root = Math.sqrt(randomNum).toFixed(7); // auf 7 Nachkommastellen runden
     setNumber(randomNum);
-    setCorrectRoot(root.toFixed(5));
+    setCorrectRoot(root);
     setUserInput("");
     setGameOver(false);
   };
 
+  const normalizeInput = (value) => {
+    return value.replace(",", "."); // , → .
+  };
+
   const handleChange = (e) => {
-    setUserInput(e.target.value);
+    const raw = e.target.value;
+    const value = normalizeInput(raw);
+    setUserInput(value);
 
     if (mode === "hard") {
-      const value = e.target.value;
       if (!value.includes(".")) return;
 
-      if (correctRoot.startsWith(value)) {
-        const correctChars = value.length - correctRoot.indexOf(".") - 1;
-        setScore(correctChars);
-      } else {
+      if (!correctRoot.startsWith(value)) {
         setGameOver(true);
         if (score > highscore) setHighscore(score);
+      } else {
+        const correctDecimals = correctRoot.split(".")[1] || "";
+        const userDecimals = value.split(".")[1] || "";
+
+        if (
+          value === correctRoot &&
+          userDecimals.length === correctDecimals.length
+        ) {
+          // Alle korrekt und vollständig
+          setScore((prev) => prev + userDecimals.length + 5); // Bonus!
+          startNewGame();
+        }
       }
     }
   };
 
   const handleKeyDown = (e) => {
+    if (mode === "hard" && e.key === "Enter") {
+      const value = normalizeInput(userInput);
+      if (!value.includes(".")) return;
+
+      let correct = 0;
+      for (let i = 0; i < value.length; i++) {
+        if (value[i] === correctRoot[i]) {
+          if (value[i] === ".") continue;
+          correct++;
+        } else {
+          break;
+        }
+      }
+
+      setScore((prev) => prev + correct);
+      startNewGame();
+    }
+
     if (mode === "easy" && (e.key === "Enter" || e.key === " ")) {
-      const inputValue = userInput.trim();
+      const inputValue = normalizeInput(userInput.trim());
       const correctInt = Math.floor(parseFloat(correctRoot)).toString();
 
       if (inputValue === correctInt) {
@@ -70,7 +102,7 @@ function RootGame() {
           <img
             className="change"
             src={changeIcon}
-            style={{ height: "1rem", overflow: "hidden"}}
+            style={{ height: "1rem", overflow: "hidden" }}
           />
         </button>
       </div>
@@ -87,7 +119,7 @@ function RootGame() {
             placeholder={
               mode === "easy"
                 ? "Ganzzahlige Wurzel"
-                : "Wurzel mit Nachkommastellen"
+                : "Wurzel mit max. 7 Nachkommastellen"
             }
             value={userInput}
             onChange={handleChange}
@@ -95,6 +127,15 @@ function RootGame() {
             className="input-field"
           />
           <p>Punkte: {score}</p>
+          <p style={{ fontSize: "0.8rem", marginTop: "4px" }}>
+              Du kannst <code>,</code> oder <code>.</code> als Komma nutzen.<br />
+              Gib deine Antwort mit <strong>Enter</strong> ab.
+          </p>
+          {mode === "hard" && (
+            <p style={{ fontSize: "0.8rem", marginTop: "4px" }}>
+              Für alle 7 Nachkommastellen korrekt: <strong>+5 Bonuspunkte</strong>
+            </p>
+          )}
         </>
       ) : gameOver ? (
         <>
